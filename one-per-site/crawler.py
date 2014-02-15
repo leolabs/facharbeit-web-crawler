@@ -12,6 +12,7 @@ import urlparse  # Bibliothek zum Parsen von Web-Adressen laden
 import urllib2  # Bibliothek zum Abrufen von Websites laden
 import threading  # Bibliothek für Threading-Funktionen laden
 import re  # Bibliothek für reguläre Ausdrücke (Regular Expressions) laden
+import time  # Bibliothek für die Zeitmessung laden
 
 from bs4 import BeautifulSoup, Comment  # Bibliothek zum Auslesen von Elementen aus dem HTML Code laden
 
@@ -51,11 +52,14 @@ class Crawler(threading.Thread):
         crawled = self.client['crawler-database']['crawled']
 
         try:
-            req = urllib2.Request(self.url, headers={'User-Agent': "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 "
-                                            "(KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36"})
+            time_start = int(round(time.time() * 1000))
+            req = urllib2.Request(self.url, headers={'User-Agent': "Mozilla/5.0 (Windows NT 6.2; Win64; x64) "
+                                                                   "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                                                   "Chrome/32.0.1667.0 Safari/537.36"})
 
             con = urllib2.urlopen(req)
             source = con.read()
+            time_response = int(round(time.time() * 1000))
             soup = BeautifulSoup(source)
         except:
             print "\t[" + str(self.depth) + "] [!!!] " + self.url + " ist fehlerhaft..."
@@ -82,6 +86,7 @@ class Crawler(threading.Thread):
                 "textblocks": filter(self.filter_readabletext, soup_texts),
                 "depth": self.depth,
                 "parent": self.parent,
+                "latency": time_response - time_start,
                 "children": []
             }
 
