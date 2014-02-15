@@ -19,19 +19,20 @@ from pymongo import MongoClient  # Bibliothek zur Verbindung von Python zur Mong
 parser = OptionParser(description="Dieses Programm crawlt Websites indem es von einer gegebenen "
                                   "Adresse aus alle Links bis zu einer gegebenen Tiefe aufruft und sie durchsucht. Die "
                                   "Ergebnisse werden in MongoDB gespeichert. Werden keine Parameter angegeben, wird "
-                                  "das Programm die in MongoDB gespeicherte Warteschlange weiter abarbeiten.", usage="")
-parser.add_option("-w", "--website", dest="website", default=False,
+                                  "das Programm die in MongoDB gespeicherte Warteschlange weiter abarbeiten.",
+                      usage="start.py [-w WEBSITE] [-d DEPTH] [-m MODE] [-t THREADS] [-v VERBOSITY]")
+parser.add_option("-w", dest="website", default=False,
                   help="Leert die Datenbank und startet das Crawling von der gegebenen Adresse aus.", metavar="WEBSITE")
-parser.add_option("-d", "--depth", dest="depth", default=3,
-                  help="Die maximale Tiefe der Links, die gecrawlt werden sollen. (Def", metavar="DEPTH")
-parser.add_option("-m", "--mode", dest="mode", default="b",
+parser.add_option("-d", dest="depth", default=3,
+                  help="Die maximale Tiefe der Links, die gecrawlt werden sollen. (Default: 3)", metavar="DEPTH")
+parser.add_option("-m", dest="mode", default="b",
                   help="Gibt an, ob der Crawler die anstehenden Seiten per "
-                       "Tiefensuche (d) oder per Breitensuche (b) arbeiten soll.", metavar="MODE")
-parser.add_option("-t", "--threads", dest="threads", default=20,
-                  help="Gibt die anzahl der Threads an, die gleichzeitig die Warteschlange abarbeiten.", metavar="MODE")
-parser.add_option("-v", "--verbosity", dest="verbosity", default="2",
+                       "Tiefensuche (d) oder per Breitensuche (b) arbeiten soll. (Default: b)", metavar="MODE")
+parser.add_option("-t", dest="threads", default=20, metavar="THREADS",
+                  help="Gibt die anzahl der Threads an, die gleichzeitig die Warteschlange abarbeiten. (Default: 20)")
+parser.add_option("-v", dest="verbosity", default="2",
                   help="Gibt die genauigkeit der Ausgabe an: 0 - Nur Fehler; 1 - 0 & Aufrufe; "
-                       "2 - 1 & Antworten; 3 - 2 & Antwort-Details; 4 - Alles", metavar="VERBOSITY")
+                       "2 - 1 & Antworten; 3 - 2 & Antwort-Details; 4 - Alles (Default: 2)", metavar="VERBOSITY")
 
 (options, args) = parser.parse_args()  # Gegebene Parameter laden.
 
