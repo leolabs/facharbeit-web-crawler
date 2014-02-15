@@ -9,11 +9,31 @@ Im Rahmen der Facharbeit "Datenbanken - Big Data" von Leo Bernard
 """
 
 import sys  # Systembezogene Funktionen laden
+import signal  # Systembezogene Funktionen laden
 import Queue  # Datenstruktur Warteschlange laden
 import crawler  # Crawler-Funktionen laden (siehe crawler.py)
 
 from optparse import OptionParser  # Bibliothek zum Verarbeiten von Kommandozeilenargumenten laden
 from pymongo import MongoClient  # Bibliothek zur Verbindung von Python zur MongoDB laden
+
+# ================ Handler für das Beenden des Programmes initialisieren ============== #
+def exit_handler():
+    print "========================================================================"
+    print "Worker werden beendet..."
+
+    for worker in workers:  # Alle laufenden Worker als zu beenden markieren
+        worker.kill_worker()
+
+    for worker in workers:  # Warten, bis alle Worker beendet wurden
+        worker.join()
+
+    print "========================================================================"
+    print "Crawling wurde beendet. Insgesamt wurden", counter, "Websites abgefragt."
+    sys.exit(0)
+
+for sig in [signal.SIGTERM, signal.SIGINT, signal.SIGHUP, signal.SIGQUIT]:
+    signal.signal(sig, exit_handler)
+
 
 # =================== Verfügbare Kommandozeilenparameter festlegen ==================== #
 parser = OptionParser(description="Dieses Programm crawlt Websites indem es von einer gegebenen "
@@ -75,15 +95,4 @@ try:  # Fehler abfangen
 
 
 except KeyboardInterrupt:  # Wenn das Programm beendet wird, alle Threads beenden
-    print "========================================================================"
-    print "Worker werden beendet..."
-
-    for worker in workers:  # Alle laufenden Worker als zu beenden markieren
-        worker.kill_worker()
-
-    for worker in workers:  # Warten, bis alle Worker beendet wurden
-        worker.join()
-
-    print "========================================================================"
-    print "Crawling wurde beendet. Insgesamt wurden", counter, "Websites abgefragt."
-    sys.exit(0)
+    exit_handler()
